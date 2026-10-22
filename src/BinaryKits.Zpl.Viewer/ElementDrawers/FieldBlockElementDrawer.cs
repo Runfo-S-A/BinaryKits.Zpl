@@ -7,7 +7,6 @@ using SkiaSharp.HarfBuzz;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -180,18 +179,6 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
             }
 
             return currentPosition;
-        }
-
-        private static string Reverse(string text)
-        {
-            TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(text);
-            List<string> reversed = [];
-            while (elements.MoveNext())
-            {
-                reversed.Insert(0, elements.GetTextElement());
-            }
-
-            return string.Concat(reversed);
         }
 
         private static List<string> WordWrap(string text, SKFont font, int maxWidth)

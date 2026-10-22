@@ -67,6 +67,10 @@ namespace BinaryKits.Zpl.Viewer.UnitTest
             CollectionAssert.AreEqual(
                 Draw("^XA^FT0,50^A0N,40^FB400,1,0,R^FDBA^FS^XZ"),
                 Draw("^XA^FPR^FT400,50^A0N,40^FB400,1,0,L^FDAB^FS^XZ"));
+            // Nor mirrors brackets: data stores ")x(" so it prints "(x)"
+            CollectionAssert.AreEqual(
+                Draw("^XA^FT0,50^A0N,40^FB400,1,0,R^FD(A)^FS^XZ"),
+                Draw("^XA^FPR^FT400,50^A0N,40^FB400,1,0,L^FD)A(^FS^XZ"));
         }
 
         [TestMethod]

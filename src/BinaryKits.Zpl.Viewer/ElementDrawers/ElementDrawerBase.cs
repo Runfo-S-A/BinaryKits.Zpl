@@ -5,6 +5,8 @@ using SkiaSharp;
 using SkiaSharp.HarfBuzz;
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace BinaryKits.Zpl.Viewer.ElementDrawers
 {
@@ -26,6 +28,21 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
         public abstract bool CanDraw(ZplElementBase element);
 
         /// <summary>
+        /// Text in visual order for ^FPR: characters reversed, combining marks kept with their base
+        /// </summary>
+        protected static string Reverse(string text)
+        {
+            TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(text);
+            List<string> reversed = [];
+            while (elements.MoveNext())
+            {
+                reversed.Insert(0, elements.GetTextElement());
+            }
+
+            return string.Concat(reversed);
+        }
+
+        /// <summary>
         /// DrawShapedText, but ^FPR lays every character right to left whatever its script, as the printer does
         /// </summary>
         protected void DrawShapedText(string text, float x, float y, SKTextAlign textAlign, SKFont font, SKPaint paint, bool rightToLeft)
@@ -36,11 +53,12 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
                 return;
             }
 
+            // Reversed and shaped left to right: shaping right to left would also mirror brackets, which the printer doesn't
             using SKShaper shaper = new(font.Typeface);
             using HarfBuzzSharp.Buffer buffer = new();
-            buffer.AddUtf16(text);
+            buffer.AddUtf16(Reverse(text));
             buffer.GuessSegmentProperties();
-            buffer.Direction = HarfBuzzSharp.Direction.RightToLeft;
+            buffer.Direction = HarfBuzzSharp.Direction.LeftToRight;
             SKShaper.Result result = shaper.Shape(buffer, font);
 
             using SKTextBlobBuilder builder = new();
