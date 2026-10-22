@@ -15,9 +15,11 @@ namespace BinaryKits.Zpl.Viewer
     public class ZplElementDrawer
     {
         /// <summary>
-        /// The array of <see cref="IElementDrawer"/> to draw <see cref="ZplElementBase"/>
+        /// The array of <see cref="IElementDrawer"/> to draw <see cref="ZplElementBase"/>.
+        /// Per instance, not static: drawers keep the current canvas between Prepare and Draw,
+        /// so sharing them lets concurrent renders draw onto each other's (possibly disposed) canvas.
         /// </summary>
-        public static IElementDrawer[] ElementDrawers { get; } = [
+        private readonly IElementDrawer[] elementDrawers = [
                 new AztecBarcodeElementDrawer(),
                 new Barcode128ElementDrawer(),
                 new Barcode39ElementDrawer(),
@@ -148,7 +150,7 @@ namespace BinaryKits.Zpl.Viewer
                     continue;
                 }
 
-                IElementDrawer drawer = ElementDrawers.SingleOrDefault(o => o.CanDraw(element));
+                IElementDrawer drawer = this.elementDrawers.SingleOrDefault(o => o.CanDraw(element));
                 if (drawer == null)
                 {
                     continue;
@@ -305,7 +307,7 @@ namespace BinaryKits.Zpl.Viewer
                     continue;
                 }
 
-                IElementDrawer drawer = ElementDrawers.SingleOrDefault(o => o.CanDraw(element));
+                IElementDrawer drawer = this.elementDrawers.SingleOrDefault(o => o.CanDraw(element));
                 if (drawer == null)
                 {
                     continue;

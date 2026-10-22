@@ -2,6 +2,10 @@ using BinaryKits.Zpl.Viewer.ElementDrawers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
 
 namespace BinaryKits.Zpl.Viewer.UnitTest
 {
@@ -50,6 +54,30 @@ namespace BinaryKits.Zpl.Viewer.UnitTest
 
             Common.DefaultPrint(test1, "inverted1.png", 100, 100, 8);
             Common.DefaultPrint(test2, "inverted2.png");
+        }
+
+        [TestMethod]
+        public void ConcurrentDrawsMatchSequential()
+        {
+            // Like the WebApi: every request has its own storage, analyzer and drawer
+            const string zpl = "^XA^FO20,20^GB760,560,4^FS^FO50,60^A0N,40,40^FDSynthetic label^FS" +
+                "^FO50,130^BY3^BCN,100,Y,N,N^FD0123456789^FS^FO50,300^GB300,80,80^FS" +
+                "^FO70,320^FR^A0N,40,40^FDREVERSE^FS^FO420,300^GE300,150,4^FS^XZ";
+
+            static byte[] Render(string zplData)
+            {
+                IPrinterStorage printerStorage = new PrinterStorage();
+                ZplAnalyzer analyzer = new ZplAnalyzer(printerStorage);
+                ZplElementDrawer drawer = new ZplElementDrawer(printerStorage);
+                return drawer.Draw(analyzer.Analyze(zplData).LabelInfos[0].ZplElements, 101.6, 76.2, 8);
+            }
+
+            byte[] expected = Render(zpl);
+            byte[][] results = new byte[64][];
+            Parallel.For(0, results.Length, new ParallelOptions { MaxDegreeOfParallelism = 8 }, i => results[i] = Render(zpl));
+
+            int mismatches = results.Count(r => !r.AsSpan().SequenceEqual(expected));
+            Assert.AreEqual(0, mismatches, $"{mismatches} of {results.Length} concurrent renders differ from the sequential render");
         }
     }
 }
