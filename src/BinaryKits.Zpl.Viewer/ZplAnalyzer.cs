@@ -35,6 +35,7 @@ namespace BinaryKits.Zpl.Viewer
             new FieldBlockZplCommandAnalyzer(),
             new FieldHexadecimalZplCommandAnalyzer(),
             new FieldOrientationZplCommandAnalyzer(),
+            new FieldParameterZplCommandAnalyzer(),
             new FieldNumberCommandAnalyzer(),
             new FieldVariableZplCommandAnalyzer(),
             new FieldReversePrintZplCommandAnalyzer(),

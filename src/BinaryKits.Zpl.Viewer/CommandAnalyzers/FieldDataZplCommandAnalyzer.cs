@@ -127,18 +127,51 @@ namespace BinaryKits.Zpl.Viewer.CommandAnalyzers
 
             bool reversePrint = virtualPrinter.NextElementFieldReverse || virtualPrinter.LabelReverse;
 
+            // ^FPR: the field origin is the right edge of the text.
+            // shortcut: only applied to normal orientation; rotated right-to-left fields keep the left-edge origin.
+            bool rightToLeft = virtualPrinter.NextElementFieldReverseDirection && font.FieldOrientation == FieldOrientation.Normal;
+            if (rightToLeft)
+            {
+                fieldJustification = FieldJustification.Right;
+            }
+
             if (virtualPrinter.NextElementFieldBlock != null)
             {
                 int width = virtualPrinter.NextElementFieldBlock.WidthOfTextBlockLine;
                 int maxLineCount = virtualPrinter.NextElementFieldBlock.MaximumNumberOfLinesInTextBlock;
                 TextJustification textJustification = virtualPrinter.NextElementFieldBlock.TextJustification;
+                if (rightToLeft)
+                {
+                    x -= width;
+                    // L and R are relative to the writing direction: L is where right-to-left text starts
+                    textJustification = textJustification switch
+                    {
+                        TextJustification.Left => TextJustification.Right,
+                        TextJustification.Right => TextJustification.Left,
+                        _ => textJustification
+                    };
+
+                    if (textJustification == TextJustification.Center)
+                    {
+                        // Zebra prints centered right-to-left lines 0.84 character widths right of the block center,
+                        // whatever the text length (measured on real prints at 60,50 and 60,60).
+                        int fontWidth = font.FontWidth > 0 ? font.FontWidth : font.FontHeight;
+                        x += (int)Math.Round(fontWidth * 0.84);
+                    }
+
+                    if (maxLineCount > 1)
+                    {
+                        // Zebra prints multi-line right-to-left blocks 18 dots left of single-line ones (measured at ^A1N,28 and 34).
+                        x -= 18;
+                    }
+                }
                 int lineSpace = virtualPrinter.NextElementFieldBlock.AddOrDeleteSpaceBetweenLines;
                 int hangingIndent = virtualPrinter.NextElementFieldBlock.HangingIndentOfTheSecondAndRemainingLines;
 
-                return new ZplFieldBlock(text, x, y, width, font, maxLineCount, lineSpace, textJustification, hangingIndent, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, useDefaultPosition: useDefaultPosition);
+                return new ZplFieldBlock(text, x, y, width, font, maxLineCount, lineSpace, textJustification, hangingIndent, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, useDefaultPosition: useDefaultPosition) { RightToLeft = rightToLeft };
             }
 
-            return new ZplTextField(text, x, y, font, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, fieldJustification: fieldJustification, useDefaultPosition: useDefaultPosition);
+            return new ZplTextField(text, x, y, font, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, fieldJustification: fieldJustification, useDefaultPosition: useDefaultPosition) { RightToLeft = rightToLeft };
         }
 
         private (ErrorCorrectionLevel, string) ParseQrCodeFieldData(QrCodeBarcodeFieldData qrCode, string text)

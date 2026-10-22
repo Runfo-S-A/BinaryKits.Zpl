@@ -13,6 +13,8 @@ namespace BinaryKits.Zpl.Label.Elements
         public char? HexadecimalIndicator { get; protected set; }
         //^FR
         public bool ReversePrint { get; protected set; }
+        //^FPR, set by the viewer; shortcut: not rendered back to ZPL, add it to Render if labels are built with it.
+        public bool RightToLeft { get; set; }
 
         public NewLineConversionMethod NewLineConversion { get; protected set; }
         //^FD

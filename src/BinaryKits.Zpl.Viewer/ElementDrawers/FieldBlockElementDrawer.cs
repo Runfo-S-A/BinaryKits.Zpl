@@ -7,6 +7,7 @@ using SkiaSharp.HarfBuzz;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -145,7 +146,8 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
                     {
                         x = fieldBlock.PositionX + hangingIndent;
 
-                        skFont.MeasureText(textLine, out SKRect textBounds);
+                        // Bearings come from the visual order: right to left, the first character is drawn last
+                        skFont.MeasureText(fieldBlock.RightToLeft ? Reverse(textLine) : textLine, out SKRect textBounds);
                         float diff = fieldBlock.Width - textBounds.Width;
 
                         switch (fieldBlock.TextJustification)
@@ -169,7 +171,7 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
                             skPaint.BlendMode = SKBlendMode.Xor;
                         }
 
-                        this.skCanvas.DrawShapedText(textLine, x, y, skFont, skPaint);
+                        this.DrawShapedText(textLine, x, y, SKTextAlign.Left, skFont, skPaint, fieldBlock.RightToLeft);
                         y += lineHeight;
                     }
 
@@ -178,6 +180,18 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
             }
 
             return currentPosition;
+        }
+
+        private static string Reverse(string text)
+        {
+            TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(text);
+            List<string> reversed = [];
+            while (elements.MoveNext())
+            {
+                reversed.Insert(0, elements.GetTextElement());
+            }
+
+            return string.Concat(reversed);
         }
 
         private static List<string> WordWrap(string text, SKFont font, int maxWidth)

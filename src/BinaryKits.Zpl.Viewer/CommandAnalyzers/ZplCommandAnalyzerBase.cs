@@ -78,7 +78,8 @@ namespace BinaryKits.Zpl.Viewer.CommandAnalyzers
 
         protected bool ConvertBoolean(string yesOrNo, string defaultValue = "N")
         {
-            return (!string.IsNullOrEmpty(yesOrNo) ? yesOrNo : defaultValue) == "Y";
+            // Printers accept lowercase y/n
+            return string.Equals(!string.IsNullOrEmpty(yesOrNo) ? yesOrNo : defaultValue, "Y", System.StringComparison.OrdinalIgnoreCase);
         }
 
         protected int IndexOfNthCharacter(string input, int occurranceToFind, char charToFind)

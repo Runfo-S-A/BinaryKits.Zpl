@@ -24,6 +24,7 @@ namespace BinaryKits.Zpl.Viewer
         public FontInfo NextFont { get; private set; }
 
         public bool NextElementFieldReverse { get; private set; }
+        public bool NextElementFieldReverseDirection { get; private set; }
         public char? NextElementFieldHexadecimalIndicator { get; private set; }
         public FieldJustification NextElementFieldJustification { get; private set; } = FieldJustification.None;
         public bool LabelReverse { get; private set; }
@@ -90,6 +91,16 @@ namespace BinaryKits.Zpl.Viewer
         public void ClearNextElementFieldReverse()
         {
             this.NextElementFieldReverse = false;
+        }
+
+        public void SetNextElementFieldReverseDirection()
+        {
+            this.NextElementFieldReverseDirection = true;
+        }
+
+        public void ClearNextElementFieldReverseDirection()
+        {
+            this.NextElementFieldReverseDirection = false;
         }
 
         public void SetNextElementFieldHexadecimalIndicator(char replaceChar)

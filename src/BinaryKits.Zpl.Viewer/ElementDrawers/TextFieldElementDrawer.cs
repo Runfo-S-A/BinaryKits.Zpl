@@ -156,7 +156,7 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
                         }
                     }
 
-                    this.skCanvas.DrawShapedText(displayText, x, y, textAlign, skFont, skPaint);
+                    this.DrawShapedText(displayText, x, y, textAlign, skFont, skPaint, textField.RightToLeft);
 
                     // Update the next default field position after rendering
                     return this.CalculateNextDefaultPosition(x, y, totalWidth, textBounds.Height, false, textField.Font.FieldOrientation, currentPosition);

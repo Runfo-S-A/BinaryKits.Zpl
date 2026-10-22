@@ -2,6 +2,9 @@
 using BinaryKits.Zpl.Label.Elements;
 
 using SkiaSharp;
+using SkiaSharp.HarfBuzz;
+
+using System;
 
 namespace BinaryKits.Zpl.Viewer.ElementDrawers
 {
@@ -21,6 +24,49 @@ namespace BinaryKits.Zpl.Viewer.ElementDrawers
 
         ///<inheritdoc/>
         public abstract bool CanDraw(ZplElementBase element);
+
+        /// <summary>
+        /// DrawShapedText, but ^FPR lays every character right to left whatever its script, as the printer does
+        /// </summary>
+        protected void DrawShapedText(string text, float x, float y, SKTextAlign textAlign, SKFont font, SKPaint paint, bool rightToLeft)
+        {
+            if (!rightToLeft)
+            {
+                this.skCanvas.DrawShapedText(text, x, y, textAlign, font, paint);
+                return;
+            }
+
+            using SKShaper shaper = new(font.Typeface);
+            using HarfBuzzSharp.Buffer buffer = new();
+            buffer.AddUtf16(text);
+            buffer.GuessSegmentProperties();
+            buffer.Direction = HarfBuzzSharp.Direction.RightToLeft;
+            SKShaper.Result result = shaper.Shape(buffer, font);
+
+            using SKTextBlobBuilder builder = new();
+            SKPositionedRunBuffer run = builder.AllocatePositionedRun(font, result.Codepoints.Length);
+            Span<ushort> glyphs = run.Glyphs;
+            Span<SKPoint> positions = run.Positions;
+            for (int i = 0; i < result.Codepoints.Length; i++)
+            {
+                glyphs[i] = (ushort)result.Codepoints[i];
+                positions[i] = result.Points[i];
+            }
+
+            float width = result.Width;
+            x -= textAlign switch
+            {
+                SKTextAlign.Center => width / 2,
+                SKTextAlign.Right => width,
+                _ => 0
+            };
+
+            using SKTextBlob blob = builder.Build();
+            if (blob != null)
+            {
+                this.skCanvas.DrawText(blob, x, y, paint);
+            }
+        }
 
         ///<inheritdoc/>
         public virtual bool IsReverseDraw(ZplElementBase element)

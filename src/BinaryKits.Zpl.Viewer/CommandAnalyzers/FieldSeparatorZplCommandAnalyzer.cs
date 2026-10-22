@@ -26,6 +26,7 @@ namespace BinaryKits.Zpl.Viewer.CommandAnalyzers
             virtualPrinter.ClearNextElementFieldBlock();
             virtualPrinter.ClearNextElementFieldData();
             virtualPrinter.ClearNextElementFieldReverse();
+            virtualPrinter.ClearNextElementFieldReverseDirection();
             virtualPrinter.ClearNextElementFieldHexadecimalIndicator();
             virtualPrinter.ClearNextElementFieldJustification();
             virtualPrinter.ClearNextFont();
