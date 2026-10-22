@@ -70,4 +70,8 @@
     <Folder Include="Resources\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\fonts\Unified-CondensedBold.ttf" LogicalName="BinaryKits.Zpl.Viewer.fonts.Unified-CondensedBold.ttf" />
+  </ItemGroup>
+
 </Project>

@@ -66,30 +66,18 @@ namespace BinaryKits.Zpl.Viewer
         private SKTypeface typeface0;
         internal SKTypeface Typeface0 {
             get {
-                this.typeface0 ??= this.GetDefaultTypeface("0");
+                this.typeface0 ??= SKTypeface.FromStream(typeof(FontManager).Assembly.GetManifestResourceStream("BinaryKits.Zpl.Viewer.fonts.Unified-CondensedBold.ttf"));
                 return this.typeface0;
             }
         }
 
-        private SKTypeface typefaceA;
-        internal SKTypeface TypefaceA {
-            get {
-                this.typefaceA ??= this.GetDefaultTypeface("A");
-                return this.typefaceA;
-            }
-        }
+        internal SKTypeface TypefaceA => this.Typeface0;
 
         internal SKTypeface TypefaceGS { get; } = SKTypeface.FromStream(new MemoryStream(Resources.ZplGS));
 
-        public FontManager() {
-            this.FontLoader = (fontName) => {
-                if (fontName == "0")
-                {
-                    return this.Typeface0;
-                }
-
-                return this.TypefaceA;
-            };
+        public FontManager()
+        {
+            this.FontLoader = fontName => this.Typeface0;
         }
 
         /// <summary>
