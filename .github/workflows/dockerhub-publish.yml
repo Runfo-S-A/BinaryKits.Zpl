@@ -22,8 +22,7 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build the Docker image
       run: |
-        cd src
-        docker build . --tag yipingruan/binarykits-zpl:$DOCKER_TAG_PREFIX-$GITHUB_RUN_NUMBER --tag yipingruan/binarykits-zpl:latest
+        docker build -f src/Dockerfile . --tag yipingruan/binarykits-zpl:$DOCKER_TAG_PREFIX-$GITHUB_RUN_NUMBER --tag yipingruan/binarykits-zpl:latest
       
     - name: Docker Push
       run: |

@@ -9,16 +9,17 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:80
 EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["BinaryKits.Zpl.Viewer.WebApi/BinaryKits.Zpl.Viewer.WebApi.csproj", "BinaryKits.Zpl.Viewer.WebApi/"]
-COPY ["BinaryKits.Zpl.Viewer/BinaryKits.Zpl.Viewer.csproj", "BinaryKits.Zpl.Viewer/"]
-COPY ["BinaryKits.Zpl.Label/BinaryKits.Zpl.Label.csproj", "BinaryKits.Zpl.Label/"]
+COPY ["src/BinaryKits.Zpl.Viewer.WebApi/BinaryKits.Zpl.Viewer.WebApi.csproj", "BinaryKits.Zpl.Viewer.WebApi/"]
+COPY ["src/BinaryKits.Zpl.Viewer/BinaryKits.Zpl.Viewer.csproj", "BinaryKits.Zpl.Viewer/"]
+COPY ["src/BinaryKits.Zpl.Label/BinaryKits.Zpl.Label.csproj", "BinaryKits.Zpl.Label/"]
 RUN dotnet restore "BinaryKits.Zpl.Viewer.WebApi/BinaryKits.Zpl.Viewer.WebApi.csproj"
-COPY . .
+COPY src .
+COPY fonts /fonts
 WORKDIR "/src/BinaryKits.Zpl.Viewer.WebApi"
 RUN dotnet build "BinaryKits.Zpl.Viewer.WebApi.csproj" --os linux -c Release -o /app/build
 

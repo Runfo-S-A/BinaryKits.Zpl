@@ -1,0 +1,9 @@
+.git
+.codegraph
+.agents
+.codex
+.aws
+**/bin
+**/obj
+**/.vs
+**/.env
